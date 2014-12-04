@@ -48,7 +48,33 @@
   UIImage *image = [M2GridView gridImageWithGrid:grid];
   SKTexture *backgroundTexture = [SKTexture textureWithCGImage:image.CGImage];
   _board = [SKSpriteNode spriteNodeWithTexture:backgroundTexture];
-  [_board setScale:0.5];
+    
+    //image size
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        // Device is iPad
+        
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+            ([UIScreen mainScreen].scale == 2.0)) {
+            // Retina display
+            [_board setScale:0.5f];
+            
+        } else {
+            [_board setScale:1.0f];
+        }
+    } else {
+        // Device is iPhone/iPod
+        
+        if ([[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)] &&
+            ([UIScreen mainScreen].scale == 3.0)) {
+            [_board setScale:0.3333f];
+        } else {
+            [_board setScale:0.5f];
+        }
+    }
+    
+    
+  
   _board.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame));
   [self addChild:_board];
 }

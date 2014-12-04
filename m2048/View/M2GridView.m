@@ -32,28 +32,28 @@
 
 + (UIImage *)gridImageWithGrid:(M2Grid *)grid
 {
-  UIView *backgroundView = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  backgroundView.backgroundColor = [GSTATE backgroundColor];
-  
-  M2GridView *view = [[M2GridView alloc] init];
-  [backgroundView addSubview:view];
-  
-  [grid forEach:^(M2Position position) {
-    CALayer *layer = [CALayer layer];
-    CGPoint point = [GSTATE locationOfPosition:position];
+    UIView *backgroundView = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    backgroundView.backgroundColor = [GSTATE backgroundColor];
     
-    CGRect frame = layer.frame;
-    frame.size = CGSizeMake(GSTATE.tileSize, GSTATE.tileSize);
-    frame.origin = CGPointMake(point.x, [[UIScreen mainScreen] bounds].size.height - point.y - GSTATE.tileSize);
-    layer.frame = frame;
+    M2GridView *view = [[M2GridView alloc] init];
+    [backgroundView addSubview:view];
     
-    layer.backgroundColor = [GSTATE boardColor].CGColor;
-    layer.cornerRadius = GSTATE.cornerRadius;
-    layer.masksToBounds = YES;
-    [backgroundView.layer addSublayer:layer];
-  } reverseOrder:NO];
-  
-  return [M2GridView snapshotWithView:backgroundView];
+    [grid forEach:^(M2Position position) {
+        CALayer *layer = [CALayer layer];
+        CGPoint point = [GSTATE locationOfPosition:position];
+        
+        CGRect frame = layer.frame;
+        frame.size = CGSizeMake(GSTATE.tileSize, GSTATE.tileSize);
+        frame.origin = CGPointMake(point.x, [[UIScreen mainScreen] bounds].size.height - point.y - GSTATE.tileSize);
+        layer.frame = frame;
+        
+        layer.backgroundColor = [GSTATE boardColor].CGColor;
+        layer.cornerRadius = GSTATE.cornerRadius;
+        layer.masksToBounds = YES;
+        [backgroundView.layer addSublayer:layer];
+    } reverseOrder:NO];
+    
+    return [M2GridView snapshotWithView:backgroundView];
 }
 
 

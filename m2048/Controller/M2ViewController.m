@@ -23,6 +23,7 @@
   IBOutlet M2ScoreView *_scoreView;
   IBOutlet M2ScoreView *_bestView;
   
+    NSInteger _gamesPlayed;
   M2Scene *_scene;
   
   IBOutlet M2Overlay *_overlay;
@@ -42,9 +43,14 @@
   [self updateState];
     
     _gameOver = NO;
+    _gamesPlayed = [[NSUserDefaults standardUserDefaults] integerForKey:@"gamesPlayed"];
     
     // Set GameCenter Manager Delegate
     [[GameCenterManager sharedManager] setDelegate:self];
+    
+    // create Promo ad
+    self.promo = [[Promo alloc] init];
+    [self.promo fetchPromoAdWithController:self];
     
   _bestView.score.text = [NSString stringWithFormat:@"%ld", (long)[Settings integerForKey:@"Best Score"]];
   
@@ -88,11 +94,26 @@
 {
     [super viewDidAppear:animated];
     
+    // Number of played games
+    _gamesPlayed = [[NSUserDefaults standardUserDefaults] integerForKey:@"gamesPlayed"];
+    
     // GA
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
     [tracker set:kGAIScreenName value:@"Start Scene"];
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+
+    // Rate Button
+    _gamesPlayed = [[NSUserDefaults standardUserDefaults] integerForKey:@"gamesPlayed"];
+
+    if (_gamesPlayed == 4 || _gamesPlayed == 40)
+    {
+        [self.promo ratePopup];
+    }
+
+    
 }
+
+
 
 #pragma mark - Admob interstitial
 
@@ -119,10 +140,10 @@
   [_bestView updateAppearance];
   
   _restartButton.backgroundColor = [GSTATE buttonColor];
-  _restartButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:14];
+  _restartButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
   
   _settingsButton.backgroundColor = [GSTATE buttonColor];
-  _settingsButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:14];
+  _settingsButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
   
   _targetScore.textColor = [GSTATE buttonColor];
   
@@ -154,7 +175,7 @@
 
 - (void)updateScore:(NSInteger)score
 {
-  _scoreView.score.text = [NSString stringWithFormat:@"%ld", (long)score];
+    _scoreView.score.text = [NSString stringWithFormat:@"%ld", (long)score];
     
     int highScore = [Settings integerForKey:@"Best Score"];
     
@@ -165,16 +186,16 @@
         }
     }
     
-  if (highScore < score) {
-    [Settings setInteger:score forKey:@"Best Score"];
-      
-      if ([[GameCenterManager sharedManager] checkGameCenterAvailability]) {
-          [[GameCenterManager sharedManager] saveAndReportScore:(int)score leaderboard:@"2048_leaderboard"  sortOrder:GameCenterSortOrderHighToLow];
-      }
-      
-    _bestView.score.text = [NSString stringWithFormat:@"%ld", (long)score];
-      
-  }
+    if (highScore < score) {
+        [Settings setInteger:score forKey:@"Best Score"];
+        
+        if ([[GameCenterManager sharedManager] checkGameCenterAvailability]) {
+            [[GameCenterManager sharedManager] saveAndReportScore:(int)score leaderboard:@"2048_leaderboard"  sortOrder:GameCenterSortOrderHighToLow];
+        }
+        
+        _bestView.score.text = [NSString stringWithFormat:@"%ld", (long)score];
+        
+    }
 }
 
 
@@ -182,11 +203,36 @@
 {
   // Pause Sprite Kit. Otherwise the dismissal of the modal view would lag.
   ((SKView *)self.view).paused = YES;
+
+        if ([segue.identifier isEqualToString:@"Settings Segue"]) {
+            UINavigationController *navigationController = segue.destinationViewController;
+            M2SettingsViewController *controller = (M2SettingsViewController *)navigationController.topViewController;
+            controller.delegate = self;
+        }
 }
 
+# pragma mark - M2SettingViewControllerDelegate
+- (void)restartGame
+{
+    ((SKView *)self.view).paused = NO;
+    if (GSTATE.needRefresh) {
+        [GSTATE loadGlobalState];
+        [self updateState];
+        [self updateScore:0];
+        [_scene startNewGame];
+    }
+    
+    [self restart:nil];
+}
 
 - (IBAction)restart:(id)sender
 {
+    _gamesPlayed++;
+    NSLog(@">>>> GAMES PLAYES %i", _gamesPlayed);
+    
+    [[NSUserDefaults standardUserDefaults] setInteger:_gamesPlayed forKey:@"gamesPlayed"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     if (!_gameOver) {
         // Show interstitial
         [self.interstitial presentFromRootViewController:self];
@@ -202,6 +248,11 @@
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
     [tracker set:kGAIScreenName value:@"Start Scene"];
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
+- (IBAction)leaderboardButton:(id)sender
+{
+    [self showLeaderboard];
 }
 
 
@@ -285,6 +336,16 @@
 {
   [super didReceiveMemoryWarning];
   // Release any cached data, images, etc that aren't in use.
+}
+
+- (void)showLeaderboard
+{
+    if ([[GameCenterManager sharedManager] checkGameCenterAvailability]) {
+        [[GameCenterManager sharedManager] presentLeaderboardsOnViewController:(M2ViewController *)self.view.window.rootViewController];
+    } else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Game Center Unavailable" message:@"User is not signed in!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        [alert show];
+    }
 }
 
 #pragma mark - Game Center Delegate

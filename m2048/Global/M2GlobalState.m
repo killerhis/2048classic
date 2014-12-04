@@ -71,7 +71,12 @@
 
 
 - (NSInteger)tileSize {
-  return self.dimension <= 4 ? 66 : 56;
+    
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ) {
+        return self.dimension <= 4 ? 122 : 112;
+    } else {
+        return self.dimension <= 4 ? 66 : 56;
+    }
 }
 
 
@@ -83,7 +88,8 @@
 
 - (NSInteger)verticalOffset {
   CGFloat height = self.dimension * (self.tileSize + self.borderWidth) + self.borderWidth + 120;
-  return ([[UIScreen mainScreen] bounds].size.height - height) / 2;
+    //return ([[UIScreen mainScreen] bounds].size.height - height) / 2;
+    return (([[UIScreen mainScreen] bounds].size.height - height) / 2) + 25;
 }
 
 
@@ -152,21 +158,30 @@
 }
 
 
-- (CGFloat)textSizeForValue:(NSInteger)value {
-  NSInteger offset = self.dimension == 5 ? 2 : 0;
-  if (value < 100) {
-    return 32 - offset;
-  } else if (value < 1000) {
-    return 28 - offset;
-  } else if (value < 10000) {
-    return 24 - offset;
-  } else if (value < 100000) {
-    return 20 - offset;
-  } else if (value < 1000000) {
-    return 16 - offset;
-  } else {
-    return 13 - offset;
-  }
+- (CGFloat)textSizeForValue:(NSInteger)value
+{
+    int scale;
+    
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ) {
+        scale = 2;
+    } else {
+        scale = 1;
+    }
+    
+    NSInteger offset = self.dimension == 5 ? 2 : 0;
+    if (value < 100) {
+        return (32 - offset)*scale;
+    } else if (value < 1000) {
+        return (28 - offset)*scale;
+    } else if (value < 10000) {
+        return (24 - offset)*scale;
+    } else if (value < 100000) {
+        return (20 - offset)*scale;
+    } else if (value < 1000000) {
+        return (16 - offset)*scale;
+    } else {
+        return (13 - offset)*scale;
+    }
 }
 
 - (UIColor *)backgroundColor {

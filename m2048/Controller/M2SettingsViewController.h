@@ -7,7 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+#import "Promo.h"
+
+@protocol M2SettingsViewControllerDelegate <NSObject>
+-(void)restartGame;
+@end
 
 @interface M2SettingsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
-
+@property (strong, nonatomic) Promo *promo;
+@property (nonatomic, weak) id<M2SettingsViewControllerDelegate> delegate;
 @end
+
