@@ -136,40 +136,61 @@
 
 - (void)updateState
 {
-  [_scoreView updateAppearance];
-  [_bestView updateAppearance];
-  
-  _restartButton.backgroundColor = [GSTATE buttonColor];
-  _restartButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
-  
-  _settingsButton.backgroundColor = [GSTATE buttonColor];
-  _settingsButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
-  
-  _targetScore.textColor = [GSTATE buttonColor];
-  
-  long target = [GSTATE valueForLevel:GSTATE.winningLevel];
-  
-  if (target > 100000) {
-    _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:34];
-  } else if (target < 10000) {
-    _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:42];
-  } else {
-    _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:40];
-  }
-  
-  _targetScore.text = [NSString stringWithFormat:@"%ld", target];
-  
-  _subtitle.textColor = [GSTATE buttonColor];
-  _subtitle.font = [UIFont fontWithName:[GSTATE regularFontName] size:14];
-  _subtitle.text = [NSString stringWithFormat:@"Join the numbers to get to %ld!", target];
-  
-  _overlay.message.font = [UIFont fontWithName:[GSTATE boldFontName] size:36];
-  _overlay.keepPlaying.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:17];
-  _overlay.restartGame.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:17];
-  
-  _overlay.message.textColor = [GSTATE buttonColor];
-  [_overlay.keepPlaying setTitleColor:[GSTATE buttonColor] forState:UIControlStateNormal];
-  [_overlay.restartGame setTitleColor:[GSTATE buttonColor] forState:UIControlStateNormal];
+    [_scoreView updateAppearance];
+    [_bestView updateAppearance];
+    
+    _restartButton.backgroundColor = [GSTATE buttonColor];
+    _settingsButton.backgroundColor = [GSTATE buttonColor];
+    
+    _targetScore.textColor = [GSTATE buttonColor];
+    
+    long target = [GSTATE valueForLevel:GSTATE.winningLevel];
+    
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        // Device is iPad
+        _restartButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:22];
+        _settingsButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:22];
+        _subtitle.font = [UIFont fontWithName:[GSTATE regularFontName] size:28];
+        
+        _overlay.message.font = [UIFont fontWithName:[GSTATE boldFontName] size:72];
+        _overlay.keepPlaying.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:34];
+        _overlay.restartGame.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:34];
+        
+        if (target > 100000) {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:68];
+        } else if (target < 10000) {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:84];
+        } else {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:80];
+        }
+        
+    } else {
+        _restartButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
+        _settingsButton.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:11];
+        _subtitle.font = [UIFont fontWithName:[GSTATE regularFontName] size:14];
+        
+        _overlay.message.font = [UIFont fontWithName:[GSTATE boldFontName] size:36];
+        _overlay.keepPlaying.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:17];
+        _overlay.restartGame.titleLabel.font = [UIFont fontWithName:[GSTATE boldFontName] size:17];
+        
+        if (target > 100000) {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:34];
+        } else if (target < 10000) {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:42];
+        } else {
+            _targetScore.font = [UIFont fontWithName:[GSTATE boldFontName] size:40];
+        }
+    }
+
+    _targetScore.text = [NSString stringWithFormat:@"%ld", target];
+    
+    _subtitle.textColor = [GSTATE buttonColor];
+    _subtitle.text = [NSString stringWithFormat:@"Join the numbers to get to %ld!", target];
+    
+    _overlay.message.textColor = [GSTATE buttonColor];
+    [_overlay.keepPlaying setTitleColor:[GSTATE buttonColor] forState:UIControlStateNormal];
+    [_overlay.restartGame setTitleColor:[GSTATE buttonColor] forState:UIControlStateNormal];
 }
 
 
